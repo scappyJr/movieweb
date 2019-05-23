@@ -7,41 +7,31 @@ class App extends Component {
   // Update : componentWillReceiveProps() => shouldComponentUpdate() == true 
   //  => componentWillUpdate() => render() => componentDidUpdate()
 
-  state = {
-  }
+  state = {}
 
-  componentDidMount() {
-    setTimeout(() => {
-      this.setState({    
-        movies: [
-          {
-            title: "Avengers: Endgame",
-            poster: "https://movie-phinf.pstatic.net/20190417_250/1555465284425i6WQE_JPEG/movie_image.jpg"
-          },
-          {
-            title: "Pokemon Detective Pikachu",
-            poster: "https://movie-phinf.pstatic.net/20190424_53/1556091565705XDpwg_JPEG/movie_image.jpg"
-          },
-          {
-            title: "Non-Fiction",
-            poster: "https://movie-phinf.pstatic.net/20190417_245/1555462540025mC6bv_JPEG/movie_image.jpg"
-          },
-          {
-            title: "Aladdin",
-            poster: "https://movie-phinf.pstatic.net/20190418_264/1555551136912Gc6Bh_JPEG/movie_image.jpg"
-          }
-        ]
-      })
-    }, 5000)
+  componentDidMount() { // render() 후 호출
+    this._getMovies();
   }
 
   _renderMovies = () => {
-    
     const movies = this.state.movies.map((movie, index) => {
-      return <Movie title={movie.title} poster={movie.poster} key={index} />
-    });
-
+      return <Movie title={movie.title} poster={movie.large_cover_image} key={index} />
+    })
     return movies;
+  }
+
+  _getMovies = async () => {
+    const movies = await this._callApi(); // _callApi()가 끝나기를 기다리는 것(성공여부 상관X)
+    this.setState({
+      movies: movies
+    })
+  }
+
+  _callApi = () => {
+    return fetch('https://yts.am/api/v2/list_movies.json?sort_by=rating')
+    .then(response => response.json())
+    .then(json => json.data.movies)
+    .catch(err => console.log(err))
   }
 
   render() {
